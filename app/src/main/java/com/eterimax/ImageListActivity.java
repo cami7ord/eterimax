@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
@@ -53,9 +54,9 @@ public class ImageListActivity extends AppCompatActivity {
             }
         });
 
-        View recyclerView = findViewById(R.id.image_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.image_list);
+        assert mRecyclerView != null;
+        setupRecyclerView(mRecyclerView);
 
         if (findViewById(R.id.image_detail_container) != null) {
             // The detail container view will be present only in the
@@ -67,7 +68,15 @@ public class ImageListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+
+        recyclerView.setHasFixedSize(true);
+
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 3);
+        recyclerView.setLayoutManager(mLayoutManager);
+
+        RecyclerView.Adapter mAdapter = new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS);
+        recyclerView.setAdapter(mAdapter);
+
     }
 
     public class SimpleItemRecyclerViewAdapter
