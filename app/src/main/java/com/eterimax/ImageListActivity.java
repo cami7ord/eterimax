@@ -10,13 +10,22 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.eterimax.dummy.DummyContent;
+import com.eterimax.singletons.MyVolley;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -54,6 +63,8 @@ public class ImageListActivity extends AppCompatActivity {
             }
         });
 
+        downloadImages();
+
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.image_list);
         assert mRecyclerView != null;
         setupRecyclerView(mRecyclerView);
@@ -65,6 +76,29 @@ public class ImageListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+    }
+
+    private void downloadImages() {
+
+        String url = "https://api.flickr.com/services/rest/?method=flickr.panda.getList&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1";
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.e("Success res", response.toString());
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error res", error.getLocalizedMessage());
+                    }
+                });
+
+        // Access the RequestQueue through a singleton class.
+        MyVolley.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
