@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -192,7 +193,8 @@ public class ImageListActivity extends BaseActivity {
                 secret = photoObject.getString("secret");
                 ownerId = photoObject.getString("owner");
 
-                images.add(new Image.Builder(farm, server, imageId, secret, ownerId).build());
+                images.add(new Image.Builder(farm, server, imageId, secret, ownerId)
+                        .sizeSuffix("z").build());
 
             }
 
@@ -265,7 +267,11 @@ public class ImageListActivity extends BaseActivity {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ImageDetailActivity.class);
                     intent.putExtra(ARG_ITEM, new Gson().toJson(holder.mItem));
-                    context.startActivity(intent);
+
+                    ActivityOptionsCompat options = ActivityOptionsCompat.
+                            makeSceneTransitionAnimation(ImageListActivity.this, holder.mImageView, "image_transition");
+
+                    context.startActivity(intent, options.toBundle());
                 }
             });
         }
