@@ -1,9 +1,56 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/image_detail"
-    style="?android:attr/textAppearanceLarge"
+    tools:context="com.eterimax.fragments.ImageDetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:textIsSelectable="true"
-    tools:context="com.eterimax.fragments.ImageDetailFragment" />
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/buddy_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:text="cami7ord"
+            android:layout_toRightOf="@id/buddy_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"/>
+
+        <TextView
+            android:id="@+id/image_title"
+            android:text="Titulo de la foto"
+            android:layout_toRightOf="@id/buddy_icon"
+            android:layout_below="@id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/image_date"
+            android:text="3 Sept"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#888"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/image_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/image_location"
+        android:text="Belgrano, Buenos Aires"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#888"/>
+
+</LinearLayout>

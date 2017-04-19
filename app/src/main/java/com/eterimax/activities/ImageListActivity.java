@@ -95,7 +95,9 @@ public class ImageListActivity extends BaseActivity {
         isLoading = true;
         displayLoadingIndicator(true);
 
-        String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1&per_page=" + PER_PAGE + "&page=" + currentPage;
+        String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent" +
+                "&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1" +
+                "&per_page=" + PER_PAGE + "&page=" + currentPage + "&extras=description,date_taken,owner_name";
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -178,10 +180,8 @@ public class ImageListActivity extends BaseActivity {
             JSONObject photoObject;
 
             int farm;
-            String server;
-            String imageId;
-            String secret;
-            String ownerId;
+            String server, imageId, secret, ownerId;
+            String ownerName, date, title, description, location;
 
             for(int i=0 ; i<photoArray.length() ; i++) {
 
@@ -193,9 +193,13 @@ public class ImageListActivity extends BaseActivity {
                 secret = photoObject.getString("secret");
                 ownerId = photoObject.getString("owner");
 
-                images.add(new Image.Builder(farm, server, imageId, secret, ownerId)
-                        .sizeSuffix("z").build());
+                ownerName = photoObject.getString("ownername");
+                date = photoObject.getString("datetaken");
+                title = photoObject.getString("title");
+                description = photoObject.getJSONObject("description").getString("_content");
 
+                images.add(new Image.Builder(farm, server, imageId, secret, ownerId)
+                        .ownerName(ownerName).date(date).title(title).description(description).build());
             }
 
         } catch (JSONException e) {
@@ -267,10 +271,8 @@ public class ImageListActivity extends BaseActivity {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ImageDetailActivity.class);
                     intent.putExtra(ARG_ITEM, new Gson().toJson(holder.mItem));
-
                     ActivityOptionsCompat options = ActivityOptionsCompat.
-                            makeSceneTransitionAnimation(ImageListActivity.this, holder.mImageView, "image_transition");
-
+                            makeSceneTransitionAnimation(ImageListActivity.this);
                     context.startActivity(intent, options.toBundle());
                 }
             });

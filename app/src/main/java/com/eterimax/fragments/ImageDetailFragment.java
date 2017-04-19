@@ -26,15 +26,9 @@ import com.google.gson.Gson;
  * on handsets.
  */
 public class ImageDetailFragment extends Fragment {
-    /**
-     * The dummy content this fragment is presenting.
-     */
+
     private Image mItem;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public ImageDetailFragment() {
     }
 
@@ -63,9 +57,14 @@ public class ImageDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.image_detail, container, false);
 
+        //((TextView) rootView.findViewById(R.id.user_name)).setText(mItem.getOwnerName());
+
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.image_detail)).setText(mItem.getImageId());
+            ((TextView) rootView.findViewById(R.id.user_name)).setText(mItem.getOwnerName());
+            ((TextView) rootView.findViewById(R.id.image_title)).setText(mItem.getTitle());
+            ((TextView) rootView.findViewById(R.id.image_date)).setText(mItem.getDate());
+            ((TextView) rootView.findViewById(R.id.image_description)).setText(mItem.getDescription());
         }
 
         return rootView;
