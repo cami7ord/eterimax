@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Eterimax</string>
     <string name="title_image_detail">Image Detail</string>
+
+    <string name="loading">loading</string>
+    <string name="content_description_image">Flickr Image</string>
+
 </resources>
