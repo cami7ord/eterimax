@@ -1,5 +1,7 @@
 package com.eterimax.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,19 +14,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
-
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
-import com.bumptech.glide.Glide;
 import com.eterimax.R;
 import com.eterimax.pojos.Image;
 import com.eterimax.singletons.MyVolley;
+import com.google.gson.Gson;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
@@ -56,9 +55,9 @@ public class ImageListActivity extends BaseActivity {
     private List<Image> imageList;
 
     /**
-     * The argument representing the item ID.
+     * The argument representing the selected item.
      */
-    public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_ITEM = "item";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -260,16 +259,15 @@ public class ImageListActivity extends BaseActivity {
                     MyVolley.getInstance(ImageListActivity.this).getImageLoader());
             //Glide.with(ImageListActivity.this).load(mValues.get(position).toString()).into(holder.mImageView);
 
-            /*holder.mView.setOnClickListener(new View.OnClickListener() {
+            holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, ImageDetailActivity.class);
-                    intent.putExtra(ARG_ITEM_ID, holder.mItem.getImageUrl());
-
+                    intent.putExtra(ARG_ITEM, new Gson().toJson(holder.mItem));
                     context.startActivity(intent);
                 }
-            });*/
+            });
         }
 
         @Override
