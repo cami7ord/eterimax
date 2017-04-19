@@ -7,5 +7,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.eterimax.ImageListActivity"
+    tools:context="com.eterimax.activities.ImageListActivity"
     tools:listitem="@layout/image_list_content" />

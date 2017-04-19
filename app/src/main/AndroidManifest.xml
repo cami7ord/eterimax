@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ImageListActivity"
+            android:name=".activities.ImageListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -22,13 +22,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ImageDetailActivity"
+            android:name=".activities.ImageDetailActivity"
             android:label="@string/title_image_detail"
-            android:parentActivityName=".ImageListActivity"
+            android:parentActivityName=".activities.ImageListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.eterimax.ImageListActivity" />
+                android:value="com.eterimax.activities.ImageListActivity" />
         </activity>
     </application>
 

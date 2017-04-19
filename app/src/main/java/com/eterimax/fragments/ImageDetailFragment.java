@@ -1,4 +1,4 @@
-package com.eterimax;
+package com.eterimax.fragments;
 
 import android.app.Activity;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -9,7 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.eterimax.dummy.DummyContent;
+import com.eterimax.R;
+import com.eterimax.activities.ImageDetailActivity;
+import com.eterimax.activities.ImageListActivity;
+import com.eterimax.pojos.DummyContent;
 
 /**
  * A fragment representing a single Image detail screen.

@@ -1,4 +1,4 @@
-package com.eterimax;
+package com.eterimax.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,8 +21,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.eterimax.dummy.DummyContent;
+import com.eterimax.fragments.ImageDetailFragment;
+import com.eterimax.R;
+import com.eterimax.pojos.DummyContent;
 import com.eterimax.singletons.MyVolley;
 
 import org.json.JSONObject;
@@ -80,7 +81,7 @@ public class ImageListActivity extends AppCompatActivity {
 
     private void downloadImages() {
 
-        String url = "https://api.flickr.com/services/rest/?method=flickr.panda.getList&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1";
+        String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1";
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {

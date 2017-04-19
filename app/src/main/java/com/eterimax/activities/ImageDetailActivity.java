@@ -1,4 +1,4 @@
-package com.eterimax;
+package com.eterimax.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+
+import com.eterimax.fragments.ImageDetailFragment;
+import com.eterimax.R;
 
 /**
  * An activity representing a single Image detail screen. This

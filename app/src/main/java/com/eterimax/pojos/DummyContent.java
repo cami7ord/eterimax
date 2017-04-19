@@ -1,4 +1,4 @@
-package com.eterimax.dummy;
+package com.eterimax.pojos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
