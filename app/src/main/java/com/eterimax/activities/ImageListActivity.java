@@ -101,7 +101,8 @@ public class ImageListActivity extends BaseActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
         List<Image> list = new ArrayList<>();
-        list.add(new Image.Builder("https://pbs.twimg.com/profile_images/768009219790503937/o2Dn7hDK.jpg").build());
+
+        list.add(new Image.Builder(3, "2867", "33321020373", "1a07911150", "55761287@N07").build());
 
         RecyclerView.Adapter mAdapter = new SimpleItemRecyclerViewAdapter(list);
         recyclerView.setAdapter(mAdapter);
@@ -127,7 +128,7 @@ public class ImageListActivity extends BaseActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            Glide.with(ImageListActivity.this).load(mValues.get(position).getImageUrl()).into(holder.mImageView);
+            Glide.with(ImageListActivity.this).load(mValues.get(position).toString()).into(holder.mImageView);
 
             /*holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
