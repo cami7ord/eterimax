@@ -20,6 +20,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NetworkImageView;
 import com.bumptech.glide.Glide;
 import com.eterimax.R;
 import com.eterimax.pojos.Image;
@@ -45,11 +46,15 @@ public class ImageListActivity extends BaseActivity {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
 
     private static final int GRID_SPAN = 3;
-    private static final int PER_PAGE = 18;
+    private static final int PER_PAGE = 60;
     private int currentPage = 1;
     private boolean isLoading = false;
+
+    private List<Image> imageList;
+
     /**
      * The argument representing the item ID.
      */
@@ -73,22 +78,22 @@ public class ImageListActivity extends BaseActivity {
             }
         });
 
+
+        imageList = new ArrayList<>(PER_PAGE);
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         mRecyclerView = (RecyclerView) findViewById(R.id.image_list);
 
         // Start our refresh background task
-        initiateRefresh();
+        initiateRefresh(currentPage);
 
     }
 
-    private void initiateRefresh() {
+    private void initiateRefresh(final int page) {
 
-        // We make sure that the SwipeRefreshLayout is displaying it's refreshing indicator
-        if (!mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
-
-        currentPage = 1;
+        currentPage = page;
+        isLoading = true;
+        displayLoadingIndicator(true);
 
         String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1&per_page=" + PER_PAGE + "&page=" + currentPage;
 
@@ -98,14 +103,20 @@ public class ImageListActivity extends BaseActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e("Success res", response.toString());
-                        setupRecyclerView(response);
+                        if(page <= 1) {
+                            setupRecyclerView(response);
+                        } else {
+                            modifyRecyclerView(response);
+                        }
+                        isLoading = false;
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("Error res", error.getLocalizedMessage());
-                        mSwipeRefreshLayout.setRefreshing(false);
+                        displayLoadingIndicator(false);
+                        isLoading = false;
                     }
                 });
 
@@ -113,22 +124,48 @@ public class ImageListActivity extends BaseActivity {
         MyVolley.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
+    private void displayLoadingIndicator(boolean loading) {
+        // We make sure that the SwipeRefreshLayout is displaying it's refreshing indicator
+        if(currentPage == 1) {
+            if(loading) {
+                if (!mSwipeRefreshLayout.isRefreshing()) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            } else {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }  else {
+            if(loading) {
+                showProgressDialog();
+            } else {
+                hideProgressDialog();
+            }
+        }
+    }
+
     private void setupRecyclerView(@NonNull JSONObject response) {
 
-        mRecyclerView.setHasFixedSize(true);
+        //mRecyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, GRID_SPAN);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        RecyclerView.Adapter mAdapter = new SimpleItemRecyclerViewAdapter(parseResponse(response));
+        imageList = parseResponse(response);
+
+        mAdapter = new SimpleItemRecyclerViewAdapter(imageList);
         mRecyclerView.setAdapter(mAdapter);
 
         // Stop the refreshing indicator
-        hideProgressDialog();
-        mSwipeRefreshLayout.setRefreshing(false);
+        displayLoadingIndicator(false);
 
         setupPagination();
+    }
 
+    private void modifyRecyclerView(@NonNull JSONObject response) {
+        imageList.addAll(parseResponse(response));
+        mAdapter.notifyItemRangeInserted(imageList.size(), imageList.size() + PER_PAGE);
+        // Stop the refreshing indicator
+        displayLoadingIndicator(false);
     }
 
     private List<Image> parseResponse(JSONObject response) {
@@ -176,7 +213,7 @@ public class ImageListActivity extends BaseActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                initiateRefresh();
+                initiateRefresh(1);
             }
         });
     }
@@ -185,8 +222,7 @@ public class ImageListActivity extends BaseActivity {
         Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
             public void onLoadMore() {
-                Toast.makeText(ImageListActivity.this, "onLoadMore bottom", Toast.LENGTH_SHORT).show();
-                isLoading = true;
+                initiateRefresh(++currentPage);
             }
 
             @Override
@@ -220,7 +256,9 @@ public class ImageListActivity extends BaseActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            Glide.with(ImageListActivity.this).load(mValues.get(position).toString()).into(holder.mImageView);
+            holder.mImageView.setImageUrl(mValues.get(position).toString(),
+                    MyVolley.getInstance(ImageListActivity.this).getImageLoader());
+            //Glide.with(ImageListActivity.this).load(mValues.get(position).toString()).into(holder.mImageView);
 
             /*holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -241,13 +279,13 @@ public class ImageListActivity extends BaseActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
-            public final ImageView mImageView;
+            public final NetworkImageView mImageView;
             public Image mItem;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mImageView = (ImageView) view.findViewById(R.id.flickr_image);
+                mImageView = (NetworkImageView) view.findViewById(R.id.flickr_image);
             }
         }
     }
