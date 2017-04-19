@@ -2,6 +2,7 @@ package com.eterimax.activities;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 
 import com.android.volley.Request;
@@ -22,7 +24,11 @@ import com.bumptech.glide.Glide;
 import com.eterimax.R;
 import com.eterimax.pojos.Image;
 import com.eterimax.singletons.MyVolley;
+import com.mugen.Mugen;
+import com.mugen.MugenCallbacks;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -37,7 +43,13 @@ import java.util.List;
 
 public class ImageListActivity extends BaseActivity {
 
-    RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView mRecyclerView;
+
+    private static final int GRID_SPAN = 3;
+    private static final int PER_PAGE = 18;
+    private int currentPage = 1;
+    private boolean isLoading = false;
     /**
      * The argument representing the item ID.
      */
@@ -61,16 +73,24 @@ public class ImageListActivity extends BaseActivity {
             }
         });
 
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         mRecyclerView = (RecyclerView) findViewById(R.id.image_list);
-        downloadImages();
+
+        // Start our refresh background task
+        initiateRefresh();
 
     }
 
-    private void downloadImages() {
+    private void initiateRefresh() {
 
-        showProgressDialog();
+        // We make sure that the SwipeRefreshLayout is displaying it's refreshing indicator
+        if (!mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
 
-        String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1";
+        currentPage = 1;
+
+        String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1&per_page=" + PER_PAGE + "&page=" + currentPage;
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -78,14 +98,14 @@ public class ImageListActivity extends BaseActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.e("Success res", response.toString());
-                        setupRecyclerView(mRecyclerView);
-                        hideProgressDialog();
+                        setupRecyclerView(response);
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("Error res", error.getLocalizedMessage());
+                        mSwipeRefreshLayout.setRefreshing(false);
                     }
                 });
 
@@ -93,20 +113,92 @@ public class ImageListActivity extends BaseActivity {
         MyVolley.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
+    private void setupRecyclerView(@NonNull JSONObject response) {
 
-        recyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(true);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 3);
-        recyclerView.setLayoutManager(mLayoutManager);
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, GRID_SPAN);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<Image> list = new ArrayList<>();
+        RecyclerView.Adapter mAdapter = new SimpleItemRecyclerViewAdapter(parseResponse(response));
+        mRecyclerView.setAdapter(mAdapter);
 
-        list.add(new Image.Builder(3, "2867", "33321020373", "1a07911150", "55761287@N07").build());
+        // Stop the refreshing indicator
+        hideProgressDialog();
+        mSwipeRefreshLayout.setRefreshing(false);
 
-        RecyclerView.Adapter mAdapter = new SimpleItemRecyclerViewAdapter(list);
-        recyclerView.setAdapter(mAdapter);
+        setupPagination();
 
+    }
+
+    private List<Image> parseResponse(JSONObject response) {
+
+        List<Image> images = new ArrayList<>(PER_PAGE);
+
+        try {
+
+            JSONArray photoArray = response.getJSONObject("photos").getJSONArray("photo");
+            JSONObject photoObject;
+
+            int farm;
+            String server;
+            String imageId;
+            String secret;
+            String ownerId;
+
+            for(int i=0 ; i<photoArray.length() ; i++) {
+
+                photoObject = photoArray.getJSONObject(i);
+
+                farm = photoObject.getInt("farm");
+                server = photoObject.getString("server");
+                imageId = photoObject.getString("id");
+                secret = photoObject.getString("secret");
+                ownerId = photoObject.getString("owner");
+
+                images.add(new Image.Builder(farm, server, imageId, secret, ownerId).build());
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return images;
+    }
+
+    private void setupPagination() {
+        setupRefresh();
+        setupLoadMore();
+    }
+
+    private void setupRefresh() {
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                initiateRefresh();
+            }
+        });
+    }
+
+    private void setupLoadMore() {
+        Mugen.with(mRecyclerView, new MugenCallbacks() {
+            @Override
+            public void onLoadMore() {
+                Toast.makeText(ImageListActivity.this, "onLoadMore bottom", Toast.LENGTH_SHORT).show();
+                isLoading = true;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+
+            @Override
+            public boolean hasLoadedAllItems() {
+                return false;
+            }
+        }).start();
     }
 
     public class SimpleItemRecyclerViewAdapter
