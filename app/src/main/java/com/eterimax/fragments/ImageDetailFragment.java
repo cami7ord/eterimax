@@ -17,6 +17,7 @@ import com.eterimax.activities.ImageDetailActivity;
 import com.eterimax.activities.ImageListActivity;
 import com.eterimax.pojos.Image;
 import com.eterimax.singletons.MyVolley;
+import com.eterimax.utilities.Utilities;
 import com.google.gson.Gson;
 
 /**
@@ -61,9 +62,12 @@ public class ImageDetailFragment extends Fragment {
 
         // Show the dummy content as text in a TextView.
         if (mItem != null) {
+            String buddyIcon = "https://flickr.com/buddyicons/" + mItem.getOwnerId() + ".jpg";
+            ((NetworkImageView) rootView.findViewById(R.id.buddy_icon)).
+                    setImageUrl(buddyIcon, MyVolley.getInstance(getActivity()).getImageLoader());
             ((TextView) rootView.findViewById(R.id.user_name)).setText(mItem.getOwnerName());
             ((TextView) rootView.findViewById(R.id.image_title)).setText(mItem.getTitle());
-            ((TextView) rootView.findViewById(R.id.image_date)).setText(mItem.getDate());
+            ((TextView) rootView.findViewById(R.id.image_date)).setText(Utilities.simpleServerDayFormat(mItem.getDate()));
             ((TextView) rootView.findViewById(R.id.image_description)).setText(mItem.getDescription());
         }
 

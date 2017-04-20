@@ -3,28 +3,29 @@
     tools:context="com.eterimax.fragments.ImageDetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.android.volley.toolbox.NetworkImageView
+        <com.eterimax.utilities.CircularNetworkImageView
             android:id="@+id/buddy_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
 
         <TextView
             android:id="@+id/user_name"
-            android:text="cami7ord"
             android:layout_toRightOf="@id/buddy_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="18sp"
             android:fontFamily="sans-serif-medium"/>
 
         <TextView
             android:id="@+id/image_title"
-            android:text="Titulo de la foto"
             android:layout_toRightOf="@id/buddy_icon"
             android:layout_below="@id/user_name"
             android:layout_width="wrap_content"
@@ -32,11 +33,10 @@
 
         <TextView
             android:id="@+id/image_date"
-            android:text="3 Sept"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#888"/>
+            android:textColor="@color/grey"/>
 
     </RelativeLayout>
 
