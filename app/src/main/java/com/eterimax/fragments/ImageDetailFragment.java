@@ -1,6 +1,7 @@
 package com.eterimax.fragments;
 
 import android.app.Activity;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,8 @@ import org.json.JSONObject;
 public class ImageDetailFragment extends Fragment {
 
     private Image mItem;
+    private AppBarLayout appBarLayout;
+    private CollapsingToolbarLayout collapsingToolbar;
 
     public ImageDetailFragment() {
     }
@@ -51,12 +54,15 @@ public class ImageDetailFragment extends Fragment {
             mItem = new Gson().fromJson(getArguments().getString(ImageListActivity.ARG_ITEM), Image.class);
 
             Activity activity = this.getActivity();
-
             NetworkImageView headerImage = (NetworkImageView) activity.findViewById(R.id.image);
 
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.getTitle());
+            appBarLayout = (AppBarLayout) activity.findViewById(R.id.app_bar);
+            if(appBarLayout != null)
+                appBarLayout.addOnOffsetChangedListener(offsetChangedListener);
+
+            collapsingToolbar = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+            if (collapsingToolbar != null) {
+                collapsingToolbar.setTitle("");
                 headerImage.setImageUrl(mItem.toString(), MyVolley.getInstance(activity).getImageLoader());
             }
         }
@@ -117,4 +123,28 @@ public class ImageDetailFragment extends Fragment {
         // Access the RequestQueue through a singleton class.
         MyVolley.getInstance(getActivity()).addToRequestQueue(jsObjRequest);
     }
+
+    AppBarLayout.OnOffsetChangedListener offsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
+
+        boolean isShow = false;
+        int scrollRange = -1;
+
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+
+            if (scrollRange == -1) {
+                Log.e("In offset", "1");
+                scrollRange = appBarLayout.getTotalScrollRange();
+            }
+            if (scrollRange + verticalOffset == 0) {
+                Log.e("In offset", "2");
+                collapsingToolbar.setTitle(mItem.getTitle());
+                isShow = true;
+            } else if(isShow) {
+                Log.e("In offset", "3");
+                collapsingToolbar.setTitle("");
+                isShow = false;
+            }
+        }
+    };
 }

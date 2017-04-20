@@ -23,7 +23,7 @@
         </activity>
         <activity
             android:name=".activities.ImageDetailActivity"
-            android:label="@string/title_image_detail"
+            android:label="@string/empty"
             android:parentActivityName=".activities.ImageListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
