@@ -14,6 +14,7 @@
             android:id="@+id/buddy_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:src="@drawable/ic_user"
             android:paddingRight="8dp"/>
 
         <TextView
@@ -29,7 +30,8 @@
             android:id="@+id/image_title"
             android:layout_toRightOf="@id/buddy_icon"
             android:layout_below="@id/user_name"
-            android:textSize="16sp"
+            android:fontFamily="sans-serif-light"
+            android:textSize="14sp"
             android:textColor="@color/black"
             android:autoLink="web"
             android:layout_width="wrap_content"
@@ -48,13 +50,20 @@
         android:id="@+id/image_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-thin"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:autoLink="web"/>
 
     <TextView
         android:id="@+id/user_location"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        android:drawableLeft="@drawable/ic_place_black_24dp"
+        android:drawablePadding="4dp"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#888"/>
+        android:textColor="@color/grey"/>
 
 </LinearLayout>

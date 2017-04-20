@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,7 +98,11 @@ public class ImageDetailFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         Log.e("Success res", response.toString());
                         try {
-                            v.setText(response.getJSONObject("person").getJSONObject("location").getString("_content"));
+                            String location = response.getJSONObject("person").getJSONObject("location").getString("_content");
+                            if(!TextUtils.isEmpty(location)) {
+                                v.setText(location);
+                                v.setVisibility(View.VISIBLE);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

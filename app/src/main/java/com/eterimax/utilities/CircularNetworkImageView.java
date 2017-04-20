@@ -10,12 +10,18 @@ import android.graphics.RectF;
 import android.graphics.Bitmap.Config;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 
 import com.android.volley.toolbox.NetworkImageView;
 
 public class CircularNetworkImageView extends NetworkImageView {
-    Context mContext;
+
+    private Context mContext;
+    private static final int FADE_IN_TIME_MS = 250;
 
     public CircularNetworkImageView(Context context) {
         super(context);
@@ -36,8 +42,15 @@ public class CircularNetworkImageView extends NetworkImageView {
     @Override
     public void setImageBitmap(Bitmap bm) {
         if(bm==null) return;
-        setImageDrawable(new BitmapDrawable(mContext.getResources(),
-                getCircularBitmap(bm)));
+
+        TransitionDrawable td = new TransitionDrawable(new Drawable[] {
+                new ColorDrawable(ContextCompat.getColor(getContext(), android.R.color.transparent)),
+                new BitmapDrawable(mContext.getResources(), getCircularBitmap(bm))
+        });
+
+        td.setCrossFadeEnabled(true);
+        setImageDrawable(td);
+        td.startTransition(FADE_IN_TIME_MS);
     }
 
     /**
