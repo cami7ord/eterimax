@@ -11,12 +11,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +45,7 @@ import java.util.List;
  * item details.
  */
 
-public class ImageListActivity extends BaseActivity implements SearchView.OnQueryTextListener {
+public class ImageListActivity extends BaseActivity implements SearchView.OnQueryTextListener, SearchView.OnFocusChangeListener {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -57,7 +55,8 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
     private static final int PER_PAGE = 60;
     private int currentPage = 1;
     private boolean isLoading = false;
-
+    private String query = "";
+    private MenuItem searchItem;
     private List<Image> imageList;
 
     /**
@@ -74,47 +73,45 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
         imageList = new ArrayList<>(PER_PAGE);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         mRecyclerView = (RecyclerView) findViewById(R.id.image_list);
 
         // Start our refresh background task
-        initiateRefresh(currentPage);
+        fetchImages(currentPage);
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView)
                 MenuItemCompat.getActionView(searchItem);
 
         searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextFocusChangeListener(this);
 
         return true;
     }
 
-    private void initiateRefresh(final int page) {
+    private void fetchImages(final int page) {
 
         currentPage = page;
         isLoading = true;
         displayLoadingIndicator(true);
 
-        String url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent" +
+        String method = "flickr.photos.getRecent";
+        if(!TextUtils.isEmpty(query))
+            method = "flickr.photos.search";
+
+        String url = "https://api.flickr.com/services/rest/?method=" + method +
                 "&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1" +
-                "&per_page=" + PER_PAGE + "&page=" + currentPage + "&extras=description,date_taken,owner_name";
+                "&per_page=" + PER_PAGE + "&page=" + currentPage + "&extras=description,date_taken,owner_name" +
+                "&text=" + query;
+
+        Log.e("URL", url);
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -152,11 +149,13 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
                 }
             } else {
                 mSwipeRefreshLayout.setRefreshing(false);
+                hideProgressDialog();
             }
         }  else {
             if(loading) {
                 showProgressDialog();
             } else {
+                mSwipeRefreshLayout.setRefreshing(false);
                 hideProgressDialog();
             }
         }
@@ -235,7 +234,8 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                initiateRefresh(1);
+                query = "";
+                fetchImages(1);
             }
         });
     }
@@ -244,7 +244,7 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
         Mugen.with(mRecyclerView, new MugenCallbacks() {
             @Override
             public void onLoadMore() {
-                initiateRefresh(++currentPage);
+                fetchImages(++currentPage);
             }
 
             @Override
@@ -260,14 +260,23 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        Log.e("Search", query);
-        return true;
+    public boolean onQueryTextSubmit(String searchQuery) {
+        query = searchQuery;
+        fetchImages(1);
+        invalidateOptionsMenu();
+        return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean hasFocus) {
+        if(!hasFocus) {
+            MenuItemCompat.collapseActionView(searchItem);
+        }
     }
 
     public class SimpleItemRecyclerViewAdapter
