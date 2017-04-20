@@ -6,4 +6,8 @@
     <string name="loading">loading</string>
     <string name="content_description_image">Flickr Image</string>
 
+    <!-- ACTIONS -->
+    <string name="search">Search</string>
+
+
 </resources>
