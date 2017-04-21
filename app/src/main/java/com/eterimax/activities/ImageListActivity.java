@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.eterimax.BuildConfig;
 import com.eterimax.R;
 import com.eterimax.pojos.Image;
 import com.eterimax.singletons.MyVolley;
@@ -106,19 +107,15 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
         if(!TextUtils.isEmpty(query))
             method = "flickr.photos.search";
 
-        String url = "https://api.flickr.com/services/rest/?method=" + method +
-                "&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1" +
-                "&per_page=" + PER_PAGE + "&page=" + currentPage + "&extras=description,date_taken,owner_name" +
+        String url = BuildConfig.BASE_URL + method + getString(R.string.api_key) +
+                "&per_page=" + PER_PAGE + "&page=" + currentPage + getString(R.string.image_extras) +
                 "&text=" + query;
-
-        Log.e("URL", url);
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.e("Success res", response.toString());
                         if(page <= 1) {
                             setupRecyclerView(response);
                         } else {
@@ -197,7 +194,7 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
 
             int farm;
             String server, imageId, secret, ownerId;
-            String ownerName, date, title, description, location;
+            String ownerName, date, title, description;
 
             for(int i=0 ; i<photoArray.length() ; i++) {
 

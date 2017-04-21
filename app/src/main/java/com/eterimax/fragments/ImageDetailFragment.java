@@ -17,6 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
+import com.eterimax.BuildConfig;
 import com.eterimax.R;
 import com.eterimax.activities.ImageDetailActivity;
 import com.eterimax.activities.ImageListActivity;
@@ -29,15 +30,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * A fragment representing a single Image detail screen.
- * This fragment is either contained in a {@link ImageListActivity}
- * in two-pane mode (on tablets) or a {@link ImageDetailActivity}
- * on handsets.
+ * A fragment representing a single {@link ImageDetailActivity}
  */
 public class ImageDetailFragment extends Fragment {
 
     private Image mItem;
-    private AppBarLayout appBarLayout;
     private CollapsingToolbarLayout collapsingToolbar;
 
     public ImageDetailFragment() {
@@ -54,7 +51,7 @@ public class ImageDetailFragment extends Fragment {
             Activity activity = this.getActivity();
             NetworkImageView headerImage = (NetworkImageView) activity.findViewById(R.id.image);
 
-            appBarLayout = (AppBarLayout) activity.findViewById(R.id.app_bar);
+             AppBarLayout appBarLayout = (AppBarLayout) activity.findViewById(R.id.app_bar);
             if(appBarLayout != null)
                 appBarLayout.addOnOffsetChangedListener(offsetChangedListener);
 
@@ -71,11 +68,8 @@ public class ImageDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.image_detail, container, false);
 
-        //((TextView) rootView.findViewById(R.id.user_name)).setText(mItem.getOwnerName());
-
-        // Show the dummy content as text in a TextView.
         if (mItem != null) {
-            String buddyIcon = "https://flickr.com/buddyicons/" + mItem.getOwnerId() + ".jpg";
+            String buddyIcon = getString(R.string.user_icon_url, mItem.getOwnerId());
             ((NetworkImageView) rootView.findViewById(R.id.buddy_icon)).
                     setImageUrl(buddyIcon, MyVolley.getInstance(getActivity()).getImageLoader());
             ((TextView) rootView.findViewById(R.id.user_name)).setText(mItem.getOwnerName());
@@ -91,9 +85,9 @@ public class ImageDetailFragment extends Fragment {
     }
 
     private void downloadUserLocation(final TextView v) {
-        String url = "https://api.flickr.com/services/rest/?method=flickr.people.getInfo" +
-                "&api_key=f08c2e99273a9d8c85ffe004223cfb4f&format=json&nojsoncallback=1" +
-                "&user_id=" + mItem.getOwnerId();
+
+        String url =  BuildConfig.BASE_URL + "flickr.people.getInfo" +
+                getString(R.string.api_key) + "&user_id=" + mItem.getOwnerId();
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -115,7 +109,7 @@ public class ImageDetailFragment extends Fragment {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("Error res", error.getLocalizedMessage());
+                        Log.e("Error res", error.getMessage());
                     }
                 });
         // Access the RequestQueue through a singleton class.
@@ -131,15 +125,12 @@ public class ImageDetailFragment extends Fragment {
         public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
 
             if (scrollRange == -1) {
-                Log.e("In offset", "1");
                 scrollRange = appBarLayout.getTotalScrollRange();
             }
             if (scrollRange + verticalOffset == 0) {
-                Log.e("In offset", "2");
                 collapsingToolbar.setTitle(mItem.getTitle());
                 isShow = true;
             } else if(isShow) {
-                Log.e("In offset", "3");
                 collapsingToolbar.setTitle("");
                 isShow = false;
             }

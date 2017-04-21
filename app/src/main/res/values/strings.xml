@@ -9,5 +9,8 @@
     <!-- ACTIONS -->
     <string name="search">Search</string>
 
+    <!-- FORMATTED URLs -->
+    <string name="user_icon_url">https://flickr.com/buddyicons/%1$s.jpg</string>
+    <string name="image_extras">&amp;extras=description,date_taken,owner_name</string>
 
 </resources>
