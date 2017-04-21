@@ -1,5 +1,7 @@
-<resources>
-    <string name="app_name">Eterimax</string>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation" >
+
+<string name="app_name">Eterimax</string>
     <string name="title_image_detail">Image Detail</string>
 
     <string name="empty"> </string>
