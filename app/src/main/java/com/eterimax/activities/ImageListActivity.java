@@ -1,10 +1,7 @@
 package com.eterimax.activities;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,22 +10,19 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.NetworkImageView;
 import com.eterimax.BuildConfig;
 import com.eterimax.R;
+import com.eterimax.adapters.SimpleItemRecyclerViewAdapter;
 import com.eterimax.pojos.Image;
 import com.eterimax.singletons.MyVolley;
-import com.google.gson.Gson;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
@@ -160,14 +154,12 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
 
     private void setupRecyclerView(@NonNull JSONObject response) {
 
-        //mRecyclerView.setHasFixedSize(true);
-
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, GRID_SPAN);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         imageList = parseResponse(response);
 
-        mAdapter = new SimpleItemRecyclerViewAdapter(imageList);
+        mAdapter = new SimpleItemRecyclerViewAdapter(this, imageList);
         mRecyclerView.setAdapter(mAdapter);
 
         // Stop the refreshing indicator
@@ -273,60 +265,6 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
     public void onFocusChange(View view, boolean hasFocus) {
         if(!hasFocus) {
             MenuItemCompat.collapseActionView(searchItem);
-        }
-    }
-
-    public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-        private final List<Image> mValues;
-
-        public SimpleItemRecyclerViewAdapter(List<Image> items) {
-            mValues = items;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.image_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-            holder.mImageView.setImageUrl(mValues.get(position).toString(),
-                    MyVolley.getInstance(ImageListActivity.this).getImageLoader());
-            //Glide.with(ImageListActivity.this).load(mValues.get(position).toString()).into(holder.mImageView);
-
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, ImageDetailActivity.class);
-                    intent.putExtra(ARG_ITEM, new Gson().toJson(holder.mItem));
-                    ActivityOptionsCompat options = ActivityOptionsCompat.
-                            makeSceneTransitionAnimation(ImageListActivity.this);
-                    context.startActivity(intent, options.toBundle());
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            return mValues.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public final View mView;
-            public final NetworkImageView mImageView;
-            public Image mItem;
-
-            public ViewHolder(View view) {
-                super(view);
-                mView = view;
-                mImageView = (NetworkImageView) view.findViewById(R.id.flickr_image);
-            }
         }
     }
 }
