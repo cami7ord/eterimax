@@ -23,6 +23,7 @@ import com.eterimax.R;
 import com.eterimax.adapters.SimpleItemRecyclerViewAdapter;
 import com.eterimax.pojos.Image;
 import com.eterimax.singletons.MyVolley;
+import com.eterimax.utilities.Utilities;
 import com.mugen.Mugen;
 import com.mugen.MugenCallbacks;
 
@@ -73,8 +74,12 @@ public class ImageListActivity extends BaseActivity implements SearchView.OnQuer
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         mRecyclerView = (RecyclerView) findViewById(R.id.image_list);
 
-        // Start our refresh background task
-        fetchImages(currentPage);
+        if(Utilities.hasInternet(this)) {
+            // Start our refresh background task
+            fetchImages(currentPage);
+        } else {
+            findViewById(R.id.no_net_layout).setVisibility(View.VISIBLE);
+        }
 
     }
 

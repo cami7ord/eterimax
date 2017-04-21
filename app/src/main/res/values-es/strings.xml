@@ -1,0 +1,14 @@
+<resources>
+
+    <string name="title_image_detail">Detalles de la Imagen</string>
+
+    <string name="loading">cargando</string>
+    <string name="content_description_image">Imagen de Flickr</string>
+
+    <!-- ACTIONS -->
+    <string name="search">Buscar</string>
+
+    <!-- ERRORS -->
+    <string name="no_internet">Porfavor, revisa tu conexión a Internet</string>
+
+</resources>
